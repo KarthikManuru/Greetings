@@ -52,6 +52,9 @@ Database Integration: Save past greetings and email addresses.
 License
 
 This project is open-source and free to use under the MIT License.
+For Running in Terminal:
+    npm start
+    node app.js
 
 Contact
 
