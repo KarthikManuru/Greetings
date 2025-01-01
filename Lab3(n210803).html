@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Greetings</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ffefba, #ffffff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: pop-in 0.5s ease;
+        }
+        h1 {
+            font-size: 3.5rem;
+            color: #ff4500;
+            margin-bottom: 30px;
+        }
+        select, button {
+            font-size: 1.3rem;
+            margin: 20px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        select {
+            background-color: #fffaf0;
+            border: 3px solid #ff4500;
+        }
+        button {
+            background-color: #ff4500;
+            color: white;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e53900;
+            transform: scale(1.1);
+        }
+        .flower {
+            position: absolute;
+            color: #ff69b4;
+            font-size: 1.8rem;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        @keyframes pop-in {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Festival Greetings</h1>
+        <label for="festival">Select a Festival:</label>
+        <select id="festival">
+            <option value="sankranthi">Sankranthi</option>
+            <option value="diwali">Diwali</option>
+            <option value="newyear">New Year</option>
+            <option value="holi">Holi</option>
+            <option value="eid">Eid</option>
+            <option value="christmas">Christmas</option>
+            <option value="navratri">Navratri</option>
+        </select>
+        <button onclick="sendGreeting()">Send Greeting</button>
+        <div class="footer">Spread joy and celebrate every festival with love!</div>
+    </div>
+
+    <script>
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            flower.innerText = ['🌸', '🌼', '🌺', '🌹'][Math.floor(Math.random() * 4)];
+            flower.style.left = Math.random() * window.innerWidth + 'px';
+            flower.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            document.body.appendChild(flower);
+            setTimeout(() => flower.remove(), 10000);
+        }
+
+        setInterval(createFlower, 300);
+
+        function sendGreeting() {
+            const festival = document.getElementById('festival').value;
+            const email = prompt('Enter recipient email:');
+
+            let custommsg = '';
+            switch(festival) {
+                case 'sankranthi':
+                    custommsg = 'Wishing you a bright and prosperous Sankranthi! Enjoy the harvest and festivities.';
+                    break;
+                case 'diwali':
+                    custommsg = 'Happy Diwali! May your life be filled with light, joy, and happiness.';
+                    break;
+                case 'newyear':
+                    custommsg = 'Happy New Year! Wishing you a year full of success and new beginnings.';
+                    break;
+                case 'holi':
+                    custommsg = 'Happy Holi! May your life be as colorful and joyful as the festival itself.';
+                    break;
+                case 'eid':
+                    custommsg = 'Eid Mubarak! May this Eid bring peace and happiness to you and your family.';
+                    break;
+                case 'christmas':
+                    custommsg = 'Merry Christmas! Wishing you warmth, joy, and peace this holiday season.';
+                    break;
+                case 'navratri':
+                    custommsg = 'Happy Navratri! May Goddess Durga bless you with strength and positivity.';
+                    break;
+            }
+
+            /* if(email) {
+                const subject = `Best Wishes for ${festival}!`;
+                const body = `${custommsg}`;
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+                alert(`Redirecting to email client to send greeting for ${festival} to ${email}`);
+            } else {
+                alert('Please enter a valid email.');
+            } */
+
+            fetch("http://localhost:5000/api/greetings/send",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    recipientEmail:email,
+                    greetingType:festival,
+                    customMessage:custommsg,
+                }),
+            }).then(response=>response.json())
+            .then(data=>{
+                alert(data.message || "Greeting sent Successfully");
+            })
+            .catch(error => {
+                alert("Failed to send greeting. Please try again later.");
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
